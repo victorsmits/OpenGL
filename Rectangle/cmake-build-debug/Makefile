@@ -111,17 +111,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named Triangle
+# Target rules for targets named Rectangle
 
 # Build rule for target.
-Triangle: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 Triangle
-.PHONY : Triangle
+Rectangle: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 Rectangle
+.PHONY : Rectangle
 
 # fast build rule for target.
-Triangle/fast:
-	$(MAKE) -f CMakeFiles/Triangle.dir/build.make CMakeFiles/Triangle.dir/build
-.PHONY : Triangle/fast
+Rectangle/fast:
+	$(MAKE) -f CMakeFiles/Rectangle.dir/build.make CMakeFiles/Rectangle.dir/build
+.PHONY : Rectangle/fast
 
 main.o: main.cpp.o
 
@@ -129,7 +129,7 @@ main.o: main.cpp.o
 
 # target to build an object file
 main.cpp.o:
-	$(MAKE) -f CMakeFiles/Triangle.dir/build.make CMakeFiles/Triangle.dir/main.cpp.o
+	$(MAKE) -f CMakeFiles/Rectangle.dir/build.make CMakeFiles/Rectangle.dir/main.cpp.o
 .PHONY : main.cpp.o
 
 main.i: main.cpp.i
@@ -138,7 +138,7 @@ main.i: main.cpp.i
 
 # target to preprocess a source file
 main.cpp.i:
-	$(MAKE) -f CMakeFiles/Triangle.dir/build.make CMakeFiles/Triangle.dir/main.cpp.i
+	$(MAKE) -f CMakeFiles/Rectangle.dir/build.make CMakeFiles/Rectangle.dir/main.cpp.i
 .PHONY : main.cpp.i
 
 main.s: main.cpp.s
@@ -147,7 +147,7 @@ main.s: main.cpp.s
 
 # target to generate assembly for a file
 main.cpp.s:
-	$(MAKE) -f CMakeFiles/Triangle.dir/build.make CMakeFiles/Triangle.dir/main.cpp.s
+	$(MAKE) -f CMakeFiles/Rectangle.dir/build.make CMakeFiles/Rectangle.dir/main.cpp.s
 .PHONY : main.cpp.s
 
 # Help Target
@@ -158,7 +158,7 @@ help:
 	@echo "... depend"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
-	@echo "... Triangle"
+	@echo "... Rectangle"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
