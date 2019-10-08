@@ -3,6 +3,7 @@ project(Rectangle)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -std=c++17  " )
 
+
 add_executable(${PROJECT_NAME} main.cpp)
 
 find_package(Vulkan REQUIRED)
