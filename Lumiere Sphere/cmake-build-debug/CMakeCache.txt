@@ -221,6 +221,12 @@ Rectangle_BINARY_DIR:STATIC=/Users/victorsmits/Dropbox/ECAM/MIN 4/GPU computing/
 //Value Computed by CMake
 Rectangle_SOURCE_DIR:STATIC=/Users/victorsmits/Dropbox/ECAM/MIN 4/GPU computing/Programmation parallèle, OpenGL/OpenGL/Lumiere Sphere
 
+//Value Computed by CMake
+S_BINARY_DIR:STATIC=/Users/victorsmits/Dropbox/ECAM/MIN 4/GPU computing/Programmation parallèle, OpenGL/OpenGL/Lumiere Sphere/cmake-build-debug
+
+//Value Computed by CMake
+S_SOURCE_DIR:STATIC=/Users/victorsmits/Dropbox/ECAM/MIN 4/GPU computing/Programmation parallèle, OpenGL/OpenGL/Lumiere Sphere
+
 //Path to a file.
 Vulkan_INCLUDE_DIR:PATH=/usr/local/include
 
