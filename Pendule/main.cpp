@@ -36,6 +36,7 @@ const std::vector<const char*> deviceExtensions = {
 	VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
+
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
 #else
@@ -548,7 +549,7 @@ private:
 
 		VkPhysicalDeviceFeatures deviceFeatures = {};
 		deviceFeatures.samplerAnisotropy = VK_TRUE;
-		//deviceFeatures.wideLines = VK_TRUE; //HERE
+//		deviceFeatures.wideLines = VK_TRUE; //HERE
 
 		VkDeviceCreateInfo createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
