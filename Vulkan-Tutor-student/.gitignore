@@ -1,0 +1,5 @@
+*.o
+VulkanLab
+main_*
+.vscode
+*.spv
