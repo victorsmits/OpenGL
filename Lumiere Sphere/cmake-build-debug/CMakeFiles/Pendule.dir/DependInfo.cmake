@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/Users/victorsmits/Dropbox/ECAM/MIN 4/GPU computing/Programmation parallèle, OpenGL/OpenGL/Pendule/main.cpp" "/Users/victorsmits/Dropbox/ECAM/MIN 4/GPU computing/Programmation parallèle, OpenGL/OpenGL/Pendule/cmake-build-debug/CMakeFiles/Pendule.dir/main.cpp.o"
+  "/Users/victorsmits/Dropbox/ECAM/MIN 4/GPU computing/Programmation parallèle, OpenGL/OpenGL/Lumiere Sphere/main.cpp" "/Users/victorsmits/Dropbox/ECAM/MIN 4/GPU computing/Programmation parallèle, OpenGL/OpenGL/Lumiere Sphere/cmake-build-debug/CMakeFiles/Pendule.dir/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "AppleClang")
 

@@ -82,6 +82,7 @@ struct Vertex {
 	glm::vec2 texCoord;
 	glm::vec3 speed;
 	float movable;
+	float norm;
 
 	static VkVertexInputBindingDescription getBindingDescription() {
 		VkVertexInputBindingDescription bindingDescription = {};
@@ -166,44 +167,36 @@ struct UniformBufferObject {
 std::vector<Vertex> vertices;
 std::vector<uint16_t> indices;
 
-void generateSphere(float radius, int divisions) {
-	for(int i=0; i <= 2*divisions; i++) {
-		for(int j=0; j <= divisions; j++) {
-			float phy = glm::radians(((float) i*360.0f)/(2*divisions));
-			float theta = glm::radians((((float) divisions)/2 - j)*(180.0f)/divisions);
-			
-			float x = radius * glm::cos(theta) * glm::cos(phy);
-			float y = radius * glm::cos(theta) * glm::sin(phy);
-			float z = radius * glm::sin(theta);
+void generateSphere(float radius) {
 
-			Vertex v;
-			v.pos = glm::vec3(x, y, z);
-			v.normal = glm::normalize(v.pos);
-			v.tangent = glm::vec3(-glm::sin(phy), glm::cos(phy), 0.0f);
-			v.texCoord = glm::vec2(((float) i)/divisions, ((float) j)/divisions);
+	for(int i=0; i < 3; i ++) {
+        float x = 0;
+        float y = 0;
+        float z = i * radius;
 
-			vertices.push_back(v);
-		}
+        Vertex v;
+        v.pos = glm::vec3(x, y, -z);
+        if(i==0){
+            v.movable = 0.0f;
+        }else{
+            v.movable = 1.0f;
+        }
+
+        v.norm = radius;
+
+        vertices.push_back(v);
+
 	}
 
-	for(int i=0; i < 2*divisions; i++) {
-		for(int j=0; j < divisions; j++) {
-			int topLeft = i*(divisions+1)+j;
-			int bottomLeft = topLeft + 1;
-			int topRight = topLeft + divisions+1;
-			int bottomRight = topRight + 1;
+    int topLeft = 0;
+    int bottomLeft = 1 ;
+    int topRight = 2 ;
 
-			indices.push_back(topLeft);
-			indices.push_back(bottomLeft);
-			indices.push_back(bottomRight);
-			indices.push_back(topLeft);
-			indices.push_back(bottomRight);
-			indices.push_back(topRight);
-		}
-	}
+    indices.push_back(topLeft);
+    indices.push_back(bottomLeft);
+    indices.push_back(topLeft);
+    indices.push_back(topRight);
 }
-
-
 
 class Engine {
 public:
@@ -300,7 +293,7 @@ private:
 	}
 
 	void initVulkan() {
-		generateSphere(1.0f, 32);
+		generateSphere(0.5f);
 		createInstance();
 		setupDebugMessenger();
 		createSurface();
@@ -1502,7 +1495,7 @@ private:
 		float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
 		UniformBufferObject ubo = {};
-		ubo.model = glm::rotate(glm::mat4(1.0f), 0.1f * time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		ubo.model = glm::rotate(glm::mat4(1.0f), 0.0f * time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		ubo.view = glm::lookAt(glm::vec3(3.0f, 0.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float) swapChainExtent.height, 0.1f, 10.0f);
 		ubo.proj[1][1] *= -1;
@@ -1788,9 +1781,31 @@ private:
 
 		Vertex* vertexData = (Vertex*) data;
 
-		for(int i=0; i<vertices.size(); i++) {
-			vertexData[i].pos.z = vertexData[i].pos.z + 0.0001;
+
+		for(int i=0; i < vertices.size(); i++) {
+		    float deltaT = 0.002;
+		    glm::vec3 g = { 0, 0, -9.81 };
+
+		    glm::vec3 initPos = vertexData[i].pos;
+
+		    vertexData[i].speed += (deltaT * g)*vertexData[i].movable;
+		    vertexData[i].pos += (deltaT * vertexData[i].speed);
+
+		    vertexData[i].speed = (vertexData[i].pos-initPos)/deltaT;
 		}
+
+        for(int j=0; j < vertices.size()-1; j++) {
+            float norm = glm::distance(vertexData[j+1].pos,vertexData[j].pos);
+            glm::vec3 unit = (vertexData[j].pos-vertexData[j+1].pos)/norm;
+
+            vertexData[j].pos -= (vertexData[j].norm - norm) * unit * 0.8f * (vertexData[j].movable/(vertexData[j+1].movable + vertexData[j].movable));
+            vertexData[j+1].pos += (vertexData[j].norm - norm) * unit * 0.8f * (vertexData[j].movable/(vertexData[j].movable + vertexData[j+1].movable));
+        }
+
+        for(int i=0; i < vertices.size(); i++) {
+            vertexData[i].speed = (vertexData[i].pos-initPos)/deltaT;
+        }
+
 
 		vkUnmapMemory(device, vertexBufferMemory);
 	}
