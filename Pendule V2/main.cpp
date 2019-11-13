@@ -36,7 +36,6 @@ const std::vector<const char*> deviceExtensions = {
 	VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
-
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
 #else
@@ -62,9 +61,10 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 struct QueueFamilyIndices {
 	std::optional<uint32_t> graphicsFamily;
 	std::optional<uint32_t> presentFamily;
+	std::optional<uint32_t> computeFamily;  //COMPUTE
 
 	bool isComplete() {
-		return graphicsFamily.has_value() && presentFamily.has_value();
+		return graphicsFamily.has_value() && presentFamily.has_value() && computeFamily.has_value(); //COMPUTE
 	}
 };
 
@@ -75,14 +75,13 @@ struct SwapChainSupportDetails {
 };
 
 struct Vertex {
-	glm::vec3 pos;
-	glm::vec3 color; // HERE
-	glm::vec3 normal;
-	glm::vec3 tangent;
-	glm::vec2 texCoord;
-	glm::vec3 speed;
+	alignas(16) glm::vec3 pos;
+	alignas(16) glm::vec3 color; // HERE
+	alignas(16) glm::vec3 normal;
+	alignas(16) glm::vec3 tangent;
+	alignas(16) glm::vec2 texCoord;
+	alignas(16) glm::vec3 speed;
 	float movable;
-	float norm;
 
 	static VkVertexInputBindingDescription getBindingDescription() {
 		VkVertexInputBindingDescription bindingDescription = {};
@@ -140,6 +139,27 @@ struct Vertex {
 	}
 };
 
+class Constraint {
+	private:
+	int A;
+	int B;
+	float length;
+
+	public:
+	Constraint(int V1, int V2, Vertex vertices[]) : A(V1), B(V2) {
+		length = glm::length(vertices[B].pos - vertices[A].pos);
+	}
+
+	// Enforce constraint with CPU
+	void apply(Vertex vertexData[]) {
+
+        glm::vec3 unit = (vertexData[A].pos-vertexData[B].pos)/length;
+
+        vertexData[A].pos += (length - glm::length(vertexData[A].pos-vertexData[B].pos)) * unit * 0.8f * (vertexData[A].movable/(vertexData[B].movable + vertexData[A].movable));
+        vertexData[B].pos -= (length - glm::length(vertexData[A].pos-vertexData[B].pos)) * unit * 0.8f * (vertexData[B].movable/(vertexData[A].movable + vertexData[B].movable));
+	}
+};
+
 struct UniformBufferObject {
 	alignas(16) glm::mat4 model;
 	alignas(16) glm::mat4 view;
@@ -167,36 +187,52 @@ struct UniformBufferObject {
 std::vector<Vertex> vertices;
 std::vector<uint16_t> indices;
 
-void generateSphere(float radius) {
+void generateSphere(float radius, int divisions) {
+	for(int i=0; i <= 2*divisions; i++) {
+		for(int j=0; j <= divisions; j++) {
+			float phy = glm::radians(((float) i*360.0f)/(2*divisions));
+			float theta = glm::radians((((float) divisions)/2 - j)*(180.0f)/divisions);
+			
+			float x = radius * glm::cos(theta) * glm::cos(phy);
+			float y = radius * glm::cos(theta) * glm::sin(phy);
+			float z = radius * glm::sin(theta);
 
-	for(int i=0; i < 3; i ++) {
-        float x = 0;
-        float z = 0;
-        float y = i * radius;
+			Vertex v;
+			v.pos = glm::vec3(x, y, z);
+			v.normal = glm::normalize(v.pos);
+			v.tangent = glm::vec3(-glm::sin(phy), glm::cos(phy), 0.0f);
+			v.texCoord = glm::vec2(((float) i)/divisions, ((float) j)/divisions);
 
-        Vertex v;
-        v.pos = glm::vec3(x, y, -z);
-        if(i==0){
-            v.movable = 0.0f;
-        }else{
-            v.movable = 1.0f;
-        }
-
-        v.norm = radius;
-
-        vertices.push_back(v);
-
+			vertices.push_back(v);
+		}
 	}
 
-    int topLeft = 0;
-    int bottomLeft = 1 ;
-    int topRight = 2 ;
+	for(int i=0; i < 2*divisions; i++) {
+		for(int j=0; j < divisions; j++) {
+			int topLeft = i*(divisions+1)+j;
+			int bottomLeft = topLeft + 1;
+			int topRight = topLeft + divisions+1;
+			int bottomRight = topRight + 1;
 
-    indices.push_back(topLeft);
-    indices.push_back(bottomLeft);
-    indices.push_back(bottomLeft);
-    indices.push_back(topRight);
+			indices.push_back(topLeft);
+			indices.push_back(bottomLeft);
+			indices.push_back(bottomRight);
+			indices.push_back(topLeft);
+			indices.push_back(bottomRight);
+			indices.push_back(topRight);
+		}
+	}
 }
+
+std::vector<Vertex> ropeVertices = {
+	{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0}, {0, 0, 0}, 0},
+	{{0, 0.2, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0}, {0, 0, 0}, 1},
+	{{0, 0.4, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0}, {0, 0, 0}, 1},
+	{{0, 0.6, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0}, {0, 0, 0}, 1}
+};
+std::vector<uint16_t> ropeIndices = {0, 1, 1, 2, 2, 3};
+
+std::vector<Constraint> ropeConstraints;
 
 class Engine {
 public:
@@ -219,6 +255,7 @@ private:
 
 	VkQueue graphicsQueue;
 	VkQueue presentQueue;
+	VkQueue computeQueue; //COMPUTE
 
 	VkSwapchainKHR swapChain;
 	std::vector<VkImage> swapChainImages;
@@ -230,6 +267,7 @@ private:
 	VkRenderPass renderPass;
 	VkDescriptorSetLayout descriptorSetLayout;
 	VkDescriptorSetLayout simpleDescriptorSetLayout; //HERE
+	VkDescriptorSetLayout computeDescriptorSetLayout; //COMPUTE
 	
 	VkPipelineLayout pipelineLayout;
 	VkPipeline graphicsPipeline;
@@ -239,6 +277,10 @@ private:
 
 	VkPipelineLayout linePipelineLayout;
 	VkPipeline lineGraphicsPipeline;
+
+	//COMPUTE
+	VkPipelineLayout computePipelineLayout;
+	VkPipeline computePipeline;
 
 	VkCommandPool commandPool;
 
@@ -261,14 +303,24 @@ private:
 	VkBuffer indexBuffer;
 	VkDeviceMemory indexBufferMemory;
 
+	VkBuffer ropeVertexBuffer;
+	VkDeviceMemory ropeVertexBufferMemory;
+	VkBuffer ropeIndexBuffer;
+	VkDeviceMemory ropeIndexBufferMemory;
+
+	VkBuffer constraintBuffer;
+	VkDeviceMemory constraintBufferMemory;
+
 	std::vector<VkBuffer> uniformBuffers;
 	std::vector<VkDeviceMemory> uniformBuffersMemory;
 
 	VkDescriptorPool descriptorPool;
 	std::vector<VkDescriptorSet> descriptorSets;
 	std::vector<VkDescriptorSet> simpleDescriptorSets; // HERE
+	VkDescriptorSet computeDescriptorSet; //COMPUTE
 
 	std::vector<VkCommandBuffer> commandBuffers;
+	VkCommandBuffer computeCommandBuffer;
 
 	std::vector<VkSemaphore> imageAvailableSemaphores;
 	std::vector<VkSemaphore> renderFinishedSemaphores;
@@ -276,6 +328,58 @@ private:
 	size_t currentFrame = 0;
 
 	bool framebufferResized = false;
+
+	void generateRopeConstraints() {
+		VkDeviceSize bufferSize = sizeof(ropeVertices[0]) * ropeVertices.size();
+		Vertex* ropeVertexData;
+		void* data;
+		vkMapMemory(device, ropeVertexBufferMemory, 0, bufferSize, 0, &data);
+
+		ropeVertexData = (Vertex*) data;
+		ropeConstraints.push_back(Constraint(0, 1, ropeVertexData));
+		ropeConstraints.push_back(Constraint(1, 2, ropeVertexData));
+		ropeConstraints.push_back(Constraint(2, 3, ropeVertexData));
+
+		vkUnmapMemory(device, ropeVertexBufferMemory);
+	}
+
+	// Physics on CPU
+	void updateRope() {
+		VkDeviceSize bufferSize = sizeof(ropeVertices[0]) * ropeVertices.size();
+		Vertex* ropeVertexData;
+		void* data;
+		vkMapMemory(device, ropeVertexBufferMemory, 0, bufferSize, 0, &data);
+
+        ropeVertexData = (Vertex*) data;
+
+        float deltaT = 0.0001;
+
+        glm::vec3* initPos = new glm::vec3[ropeVertices.size()];
+
+        // application de la gravité
+        for(int i=0; i < ropeVertices.size(); i++) {
+            glm::vec3 g = { 0, 0, -9.81 };
+            initPos[i] = ropeVertexData[i].pos;
+
+            ropeVertexData[i].speed += ((1-deltaT) * g)*ropeVertexData[i].movable;
+            ropeVertexData[i].pos += (deltaT * ropeVertexData[i].speed);
+        }
+
+		// Applaying constraints
+		for(int i=0; i<10; i++) {
+			for(Constraint& c : ropeConstraints) {
+				c.apply(ropeVertexData);
+			}
+		}
+
+        //update de la vitesse
+        for(int i=0; i < ropeVertices.size(); i++) {
+
+            ropeVertexData[i].speed = (ropeVertexData[i].pos-initPos[i])/deltaT;
+        }
+
+		vkUnmapMemory(device, ropeVertexBufferMemory);
+	}
 
 	void initWindow() {
 		glfwInit();
@@ -293,7 +397,7 @@ private:
 	}
 
 	void initVulkan() {
-		generateSphere(0.5f);
+		generateSphere(1.0f, 32);
 		createInstance();
 		setupDebugMessenger();
 		createSurface();
@@ -307,6 +411,7 @@ private:
 		createGraphicsPipeline("../shaders/vert.spv", "../shaders/frag.spv", VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, descriptorSetLayout, Vertex::getBindingDescription(), Vertex::getAttributeDescriptions(), pipelineLayout, graphicsPipeline); //HERE
 		createGraphicsPipeline("../shaders/simpleVert.spv", "../shaders/simpleFrag.spv", VK_PRIMITIVE_TOPOLOGY_POINT_LIST, simpleDescriptorSetLayout, Vertex::getBindingDescription(), Vertex::getSimpleAttributeDescriptions(), pointPipelineLayout, pointGraphicsPipeline); //HERE
 		createGraphicsPipeline("../shaders/simpleVert.spv", "../shaders/simpleFrag.spv", VK_PRIMITIVE_TOPOLOGY_LINE_LIST, simpleDescriptorSetLayout, Vertex::getBindingDescription(), Vertex::getSimpleAttributeDescriptions(), linePipelineLayout, lineGraphicsPipeline); //HERE
+		createComputePipeline("../shaders/comp.spv");
 		createCommandPool();
 		createDepthResources();
 		createFramebuffers();
@@ -314,12 +419,18 @@ private:
 		createTextureImageView();
 		createTextureSampler();
 		createVertexBuffer(vertices, vertexBuffer, vertexBufferMemory); // HERE
-		createIndexBuffer();
+		createVertexBuffer(ropeVertices, ropeVertexBuffer, ropeVertexBufferMemory); // HERE
+		generateRopeConstraints();
+		createIndexBuffer(indices, indexBuffer, indexBufferMemory);
+		createIndexBuffer(ropeIndices, ropeIndexBuffer, ropeIndexBufferMemory);
+		createConstraintBuffer(ropeConstraints, constraintBuffer, constraintBufferMemory);
 		createUniformBuffers();
 		createDescriptorPool();
 		createDescriptorSets();
 		createSimpleDescriptorSets(); //HERE
+		createComputeDescriptorSets(); //COMPUTE
 		createCommandBuffers();
+		createComputeCommandBuffer(); //COMPUTE
 		createSyncObjects();
 	}
 
@@ -380,14 +491,27 @@ private:
 		vkDestroyImage(device, normalImage, nullptr);
 		vkFreeMemory(device, normalImageMemory, nullptr);
 
+		vkDestroyPipeline(device, computePipeline, nullptr); //COMPUTE
+		vkDestroyPipelineLayout(device, computePipelineLayout, nullptr); //COMPUTE
+
 		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
 		vkDestroyDescriptorSetLayout(device, simpleDescriptorSetLayout, nullptr); //HERE
+		vkDestroyDescriptorSetLayout(device, computeDescriptorSetLayout, nullptr); //COMPUTE
 
 		vkDestroyBuffer(device, indexBuffer, nullptr);
 		vkFreeMemory(device, indexBufferMemory, nullptr);
 
+		vkDestroyBuffer(device, ropeIndexBuffer, nullptr);
+		vkFreeMemory(device, ropeIndexBufferMemory, nullptr);
+
 		vkDestroyBuffer(device, vertexBuffer, nullptr);
 		vkFreeMemory(device, vertexBufferMemory, nullptr);
+
+		vkDestroyBuffer(device, ropeVertexBuffer, nullptr);
+		vkFreeMemory(device, ropeVertexBufferMemory, nullptr);
+
+		vkDestroyBuffer(device, constraintBuffer, nullptr);
+		vkFreeMemory(device, constraintBufferMemory, nullptr);
 
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 			vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
@@ -425,9 +549,9 @@ private:
 		createSwapChain();
 		createImageViews();
 		createRenderPass();
-		createGraphicsPipeline("shaders/vert.spv", "shaders/frag.spv", VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, descriptorSetLayout, Vertex::getBindingDescription(), Vertex::getAttributeDescriptions(), pipelineLayout, graphicsPipeline); //HERE
-		createGraphicsPipeline("shaders/simpleVert.spv", "shaders/simpleFrag.spv", VK_PRIMITIVE_TOPOLOGY_POINT_LIST, simpleDescriptorSetLayout, Vertex::getBindingDescription(), Vertex::getSimpleAttributeDescriptions(), pointPipelineLayout, pointGraphicsPipeline); //HERE
-		createGraphicsPipeline("shaders/simpleVert.spv", "shaders/simpleFrag.spv", VK_PRIMITIVE_TOPOLOGY_LINE_LIST, simpleDescriptorSetLayout, Vertex::getBindingDescription(), Vertex::getSimpleAttributeDescriptions(), linePipelineLayout, lineGraphicsPipeline); //HERE
+		createGraphicsPipeline("../shaders/vert.spv", "../shaders/frag.spv", VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, descriptorSetLayout, Vertex::getBindingDescription(), Vertex::getAttributeDescriptions(), pipelineLayout, graphicsPipeline); //HERE
+		createGraphicsPipeline("../shaders/simpleVert.spv", "../shaders/simpleFrag.spv", VK_PRIMITIVE_TOPOLOGY_POINT_LIST, simpleDescriptorSetLayout, Vertex::getBindingDescription(), Vertex::getSimpleAttributeDescriptions(), pointPipelineLayout, pointGraphicsPipeline); //HERE
+		createGraphicsPipeline("../shaders/simpleVert.spv", "../shaders/simpleFrag.spv", VK_PRIMITIVE_TOPOLOGY_LINE_LIST, simpleDescriptorSetLayout, Vertex::getBindingDescription(), Vertex::getSimpleAttributeDescriptions(), linePipelineLayout, lineGraphicsPipeline); //HERE
 		createDepthResources();
 		createFramebuffers();
 		createUniformBuffers();
@@ -528,7 +652,7 @@ private:
 		QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
 
 		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-		std::set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};
+		std::set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value(), indices.computeFamily.value()}; //COMPUTE
 
 		float queuePriority = 1.0f;
 		for (uint32_t queueFamily : uniqueQueueFamilies) {
@@ -568,6 +692,7 @@ private:
 
 		vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicsQueue);
 		vkGetDeviceQueue(device, indices.presentFamily.value(), 0, &presentQueue);
+		vkGetDeviceQueue(device, indices.computeFamily.value(), 0, &computeQueue); //COMPUTE
 	}
 
 	void createSwapChain() {
@@ -894,6 +1019,65 @@ private:
 		}
 	}
 
+	//COMPUTE
+	void createComputePipeline(const std::string computeShader) {
+		auto compShaderCode = readFile(computeShader);
+
+		VkShaderModule compShaderModule = createShaderModule(compShaderCode);
+
+		VkDescriptorSetLayoutBinding descriptorSetLayoutBindings[2] = {
+			{0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT, 0},
+			{1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT, 0}
+		};
+
+		VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {
+			VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+			0, 0, 2, descriptorSetLayoutBindings
+		};
+
+		if (vkCreateDescriptorSetLayout(device, &descriptorSetLayoutCreateInfo, 0, &computeDescriptorSetLayout) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create Compute Descriptor Set Layout!");
+		}
+
+		VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = {
+			VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+			0,
+			0,
+			1,
+			&computeDescriptorSetLayout,
+			0,
+			0
+		};
+
+		if (vkCreatePipelineLayout(device, &pipelineLayoutCreateInfo, 0, &computePipelineLayout) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create Compute Pipeline Layout!");
+		}
+
+		VkComputePipelineCreateInfo computePipelineCreateInfo = {
+			VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO,
+			0,
+			0,
+			{
+				VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+				0,
+				0,
+				VK_SHADER_STAGE_COMPUTE_BIT,
+				compShaderModule,
+				"main",
+				0
+			},
+			computePipelineLayout,
+			0,
+			0
+		};
+
+		if (vkCreateComputePipelines(device, 0, 1, &computePipelineCreateInfo, 0, &computePipeline) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create Compute Pipeline!");
+		}
+
+		vkDestroyShaderModule(device, compShaderModule, nullptr);
+	}
+
 	void createCommandPool() {
 		QueueFamilyIndices queueFamilyIndices = findQueueFamilies(physicalDevice);
 
@@ -1164,9 +1348,8 @@ private:
 	void createVertexBuffer(std::vector<Vertex> vertices, VkBuffer& vertexBuffer, VkDeviceMemory& vertexBufferMemory) {
 		VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 
-		VkBuffer stagingBuffer;
-		VkDeviceMemory stagingBufferMemory;
-		createBuffer(bufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, vertexBuffer, vertexBufferMemory);
+		//COMPUTE
+		createBuffer(bufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, vertexBuffer, vertexBufferMemory);
 
 		void* data;
 		vkMapMemory(device, vertexBufferMemory, 0, bufferSize, 0, &data);
@@ -1174,7 +1357,18 @@ private:
 		vkUnmapMemory(device, vertexBufferMemory);
 	}
 
-	void createIndexBuffer() {
+	void createConstraintBuffer(std::vector<Constraint> constraints, VkBuffer& constraintBuffer, VkDeviceMemory& constraintBufferMemory) {
+		VkDeviceSize bufferSize = sizeof(constraints[0]) * constraints.size();
+
+		createBuffer(bufferSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, constraintBuffer, constraintBufferMemory);
+
+		void* data;
+		vkMapMemory(device, constraintBufferMemory, 0, bufferSize, 0, &data);
+			memcpy(data, constraints.data(), (size_t) bufferSize);
+		vkUnmapMemory(device, constraintBufferMemory);
+	}
+
+	void createIndexBuffer(std::vector<uint16_t> indices, VkBuffer& indexBuffer, VkDeviceMemory& indexBufferMemory) {
 		VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
 
 		VkBuffer stagingBuffer;
@@ -1206,17 +1400,19 @@ private:
 	}
 
 	void createDescriptorPool() {
-		std::array<VkDescriptorPoolSize, 2> poolSizes = {};
+		std::array<VkDescriptorPoolSize, 3> poolSizes = {};
 		poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 		poolSizes[0].descriptorCount = static_cast<uint32_t>(swapChainImages.size()*3); // HERE
 		poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		poolSizes[1].descriptorCount = static_cast<uint32_t>(swapChainImages.size()*2);
+		poolSizes[2].descriptorCount = 2; //COMPUTE
+		poolSizes[2].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER; //COMPUTE
 
 		VkDescriptorPoolCreateInfo poolInfo = {};
 		poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 		poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
 		poolInfo.pPoolSizes = poolSizes.data();
-		poolInfo.maxSets = static_cast<uint32_t>(swapChainImages.size()*2);
+		poolInfo.maxSets = static_cast<uint32_t>(swapChainImages.size()*2) + 1; //COMPUTE
 
 		if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create descriptor pool!");
@@ -1314,6 +1510,50 @@ private:
 
 			vkUpdateDescriptorSets(device, 1, &descriptorWrites, 0, nullptr);
 		}
+	}
+
+	//COMPUTE
+	void createComputeDescriptorSets() {
+		VkDescriptorSetAllocateInfo allocInfo = {};
+		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		allocInfo.descriptorPool = descriptorPool;
+		allocInfo.descriptorSetCount = 1;
+		allocInfo.pSetLayouts = &computeDescriptorSetLayout;
+
+		if (vkAllocateDescriptorSets(device, &allocInfo, &computeDescriptorSet) != VK_SUCCESS) {
+			throw std::runtime_error("failed to allocate compute descriptor set!");
+		}
+
+		VkDescriptorBufferInfo vertexBufferInfo = {};
+		vertexBufferInfo.buffer = ropeVertexBuffer;
+		vertexBufferInfo.offset = 0;
+		vertexBufferInfo.range = VK_WHOLE_SIZE;
+
+		VkDescriptorBufferInfo constraintBufferInfo = {};
+		constraintBufferInfo.buffer = constraintBuffer;
+		constraintBufferInfo.offset = 0;
+		constraintBufferInfo.range = VK_WHOLE_SIZE;
+
+		//VkWriteDescriptorSet descriptorWrites = {};
+		std::array<VkWriteDescriptorSet, 2> descriptorWrites = {};
+
+		descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrites[0].dstSet = computeDescriptorSet;
+		descriptorWrites[0].dstBinding = 0;
+		descriptorWrites[0].dstArrayElement = 0;
+		descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+		descriptorWrites[0].descriptorCount = 1;
+		descriptorWrites[0].pBufferInfo = &vertexBufferInfo;
+
+		descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrites[1].dstSet = computeDescriptorSet;
+		descriptorWrites[1].dstBinding = 1;
+		descriptorWrites[1].dstArrayElement = 0;
+		descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+		descriptorWrites[1].descriptorCount = 1;
+		descriptorWrites[1].pBufferInfo = &constraintBufferInfo;
+
+		vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 	}
 
 	void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
@@ -1445,25 +1685,73 @@ private:
 
 				vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[i], 0, nullptr);
 
-				vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+				//vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 
 				vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pointGraphicsPipeline); // HERE
 				
+				VkBuffer ropeVertexBuffers[] = {ropeVertexBuffer};
+				vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, ropeVertexBuffers, offsets);
+				
 				vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pointPipelineLayout, 0, 1, &simpleDescriptorSets[i], 0, nullptr); // HERE
 
-				vkCmdDraw(commandBuffers[i], static_cast<uint32_t>(vertices.size()), 1, 0, 0); // HERE
+				vkCmdDraw(commandBuffers[i], static_cast<uint32_t>(ropeVertices.size()), 1, 0, 0); // HERE
 
 				vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, lineGraphicsPipeline); // HERE
 				
 				vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, linePipelineLayout, 0, 1, &simpleDescriptorSets[i], 0, nullptr); // HERE
 
-				vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0); // HERE
+				vkCmdBindIndexBuffer(commandBuffers[i], ropeIndexBuffer, 0, VK_INDEX_TYPE_UINT16);
+
+				vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(ropeIndices.size()), 1, 0, 0, 0); // HERE
 
 			vkCmdEndRenderPass(commandBuffers[i]);
 
 			if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
 				throw std::runtime_error("failed to record command buffer!");
 			}
+		}
+	}
+
+	//COMPUTE
+	void memoryBarrier(VkCommandBuffer cmd, VkAccessFlags srcAccessMask, VkAccessFlags dstAccessMask, VkPipelineStageFlags srcStageMask, VkPipelineStageFlags dstStageMask) {
+		VkMemoryBarrier barrier = { VK_STRUCTURE_TYPE_MEMORY_BARRIER };
+		barrier.srcAccessMask = srcAccessMask;
+		barrier.dstAccessMask = dstAccessMask;
+
+		vkCmdPipelineBarrier(cmd, srcStageMask, dstStageMask, false, 1, &barrier, 0, nullptr, 0, nullptr);
+	}
+
+	//COMPUTE
+	void createComputeCommandBuffer() {
+		VkCommandBufferAllocateInfo allocInfo = {};
+		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		allocInfo.commandPool = commandPool;
+		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		allocInfo.commandBufferCount = 1;
+
+		if (vkAllocateCommandBuffers(device, &allocInfo, &computeCommandBuffer) != VK_SUCCESS) {
+			throw std::runtime_error("failed to allocate compute command buffers!");
+		}
+
+		VkCommandBufferBeginInfo beginInfo = {};
+		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+		if (vkBeginCommandBuffer(computeCommandBuffer, &beginInfo) != VK_SUCCESS) {
+			throw std::runtime_error("failed to begin recording compute command buffer!");
+		}
+
+		memoryBarrier(computeCommandBuffer, 0, 0, VK_PIPELINE_STAGE_VERTEX_SHADER_BIT, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
+
+		vkCmdBindPipeline(computeCommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, computePipeline);
+
+		vkCmdBindDescriptorSets(computeCommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, computePipelineLayout, 0, 1, &computeDescriptorSet, 0, nullptr);
+
+		vkCmdDispatch(computeCommandBuffer, ropeVertices.size()/32 + 1, 1, 1);
+
+		memoryBarrier(computeCommandBuffer, VK_ACCESS_SHADER_WRITE_BIT, VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT, VK_PIPELINE_STAGE_VERTEX_INPUT_BIT);
+
+		if (vkEndCommandBuffer(computeCommandBuffer) != VK_SUCCESS) {
+			throw std::runtime_error("failed to record compute command buffer!");
 		}
 	}
 
@@ -1495,7 +1783,7 @@ private:
 		float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
 		UniformBufferObject ubo = {};
-		ubo.model = glm::rotate(glm::mat4(1.0f), 0.0f * time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		ubo.model = glm::rotate(glm::mat4(1.0f), 0.1f * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		ubo.view = glm::lookAt(glm::vec3(3.0f, 0.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float) swapChainExtent.height, 0.1f, 10.0f);
 		ubo.proj[1][1] *= -1;
@@ -1505,6 +1793,24 @@ private:
 		vkMapMemory(device, uniformBuffersMemory[currentImage], 0, sizeof(ubo), 0, &data);
 			memcpy(data, &ubo, sizeof(ubo));
 		vkUnmapMemory(device, uniformBuffersMemory[currentImage]);
+	}
+
+	void submitComputeCommand() {
+		 VkSubmitInfo submitInfo = {
+			VK_STRUCTURE_TYPE_SUBMIT_INFO,
+			0,
+			0,
+			0,
+			0,
+			1,
+			&computeCommandBuffer,
+			0,
+			0
+		};
+
+		if (vkQueueSubmit(computeQueue, 1, &submitInfo, 0) != VK_SUCCESS) {
+			throw std::runtime_error("failed to submit compute command buffer!");
+		}
 	}
 
 	void drawFrame() {
@@ -1521,8 +1827,11 @@ private:
 		}
 
 		updateUniformBuffer(imageIndex);
-		updateVertices(); // HERE
+		//updateVertices(); // HERE
+		updateRope();
 
+//		submitComputeCommand();
+		
 		VkSubmitInfo submitInfo = {};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
@@ -1694,6 +2003,11 @@ private:
 				indices.graphicsFamily = i;
 			}
 
+			// COMPUTE
+			if (queueFamily.queueCount > 0 && queueFamily.queueFlags & VK_QUEUE_COMPUTE_BIT) {
+				indices.computeFamily = i;
+			}
+
 			VkBool32 presentSupport = false;
 			vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
 
@@ -1775,41 +2089,20 @@ private:
 	}
 
 	void updateVertices() {
-		VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
+		VkDeviceSize bufferSize = sizeof(ropeVertices[0]) * ropeVertices.size();
 		void* data;
 		vkMapMemory(device, vertexBufferMemory, 0, bufferSize, 0, &data);
 
-		Vertex* vertexData = (Vertex*) data;
-        float deltaT = 0.0001;
-
-        glm::vec3* initPos = new glm::vec3[vertices.size()];
-
-        // application de la gravité
-		for(int i=0; i < vertices.size(); i++) {
-		    glm::vec3 g = { 0, 0, -9.81 };
-            initPos[i] = vertexData[i].pos;
-
-		    vertexData[i].speed += ((1-deltaT) * g)*vertexData[i].movable;
-		    vertexData[i].pos += (deltaT * vertexData[i].speed);
-		}
-
-		// application des contraintes
-        for(int j=0; j < vertices.size()-1; j++) {
-
-            float norm = glm::length(vertexData[j].pos - vertexData[j+1].pos);
-            glm::vec3 unit = (vertexData[j].pos-vertexData[j+1].pos)/norm;
-
-            vertexData[j].pos += (vertexData[j].norm - norm) * unit * 0.8f * (vertexData[j].movable/(vertexData[j+1].movable + vertexData[j].movable));
-            vertexData[j+1].pos -= (vertexData[j].norm - norm) * unit * 0.8f * (vertexData[j+1].movable/(vertexData[j].movable + vertexData[j+1].movable));
-        }
-
-        //update de la vitesse
-        for(int i=0; i < vertices.size(); i++) {
-
-            vertexData[i].speed = (vertexData[i].pos-initPos[i])/deltaT;
-        }
-
-		delete[] initPos;
+//		Vertex* vertexData = (Vertex*) data;
+//
+//
+//        for(int j=0; j < ropeConstraints.size()-1; j++) {
+//
+//        }
+//
+//
+//
+//        delete[] initPos;
 
 		vkUnmapMemory(device, vertexBufferMemory);
 	}
