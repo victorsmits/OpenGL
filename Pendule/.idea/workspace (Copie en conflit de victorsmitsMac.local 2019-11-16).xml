@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
+    <generated>
+      <config projectName="Pendule" targetName="Pendule" />
+    </generated>
+  </component>
+  <component name="CMakeSettings" AUTO_RELOAD="true">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="6fad07df-421d-497b-aff4-6255604e3eac" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/../Sphere et tissus/cmake-build-debug/CMakeFiles/Sphere_tissus.dir/main.cpp.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_DATA_SOURCES" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <option name="HIDDEN_KINDS">
+      <set />
+    </option>
+    <expand />
+    <select />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="GLSL Shader" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="IgnoredFileRootStore">
+    <option name="generatedRoots">
+      <set>
+        <option value="$PROJECT_DIR$/.idea" />
+      </set>
+    </option>
+  </component>
+  <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
+  <component name="ProjectId" id="1RKqEOOqDqPbq6VIiGobS7PKcQ8" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
+    <property name="settings.editor.selected.configurable" value="preferences.fileTypes" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/shaders" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration name="Pendule" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Pendule" TARGET_NAME="Pendule" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Pendule" RUN_TARGET_NAME="Pendule">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="6fad07df-421d-497b-aff4-6255604e3eac" name="Default Changelist" comment="" />
+      <created>1569426022236</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1569426022236</updated>
+      <workItem from="1569426024004" duration="929000" />
+      <workItem from="1569429429826" duration="1778000" />
+      <workItem from="1569433068491" duration="1369000" />
+      <workItem from="1569478274977" duration="1493000" />
+      <workItem from="1569482505960" duration="186000" />
+      <workItem from="1569773147636" duration="48000" />
+      <workItem from="1569825255610" duration="94000" />
+      <workItem from="1569844466047" duration="314000" />
+      <workItem from="1569845514868" duration="95000" />
+      <workItem from="1569846473088" duration="147000" />
+      <workItem from="1569846631408" duration="23000" />
+      <workItem from="1569846665284" duration="74000" />
+      <workItem from="1569846750072" duration="429000" />
+      <workItem from="1569847190584" duration="28000" />
+      <workItem from="1569847229345" duration="18000" />
+      <workItem from="1569847256702" duration="9000" />
+      <workItem from="1569847276120" duration="15000" />
+      <workItem from="1569847580252" duration="62000" />
+      <workItem from="1569911089998" duration="19000" />
+      <workItem from="1569911143215" duration="1229000" />
+      <workItem from="1569913166698" duration="95000" />
+      <workItem from="1569913272529" duration="198000" />
+      <workItem from="1569913521486" duration="6000" />
+      <workItem from="1569913539828" duration="4658000" />
+      <workItem from="1573026870386" duration="1666000" />
+      <workItem from="1573030800975" duration="7440000" />
+      <workItem from="1573646613888" duration="3432000" />
+      <workItem from="1573650353980" duration="21000" />
+      <workItem from="1573650644481" duration="13000" />
+      <workItem from="1573653572605" duration="1746000" />
+    </task>
+    <task id="LOCAL-00001" summary="Triangle Cmake">
+      <created>1569426078441</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1569426078441</updated>
+    </task>
+    <task id="LOCAL-00002" summary="sharders">
+      <created>1569430895267</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1569430895267</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Triangle OK">
+      <created>1569482676593</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1569482676593</updated>
+    </task>
+    <task id="LOCAL-00004" summary="start pendule">
+      <created>1573031774820</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1573031774820</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Pendule work finish">
+      <created>1573650141859</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1573650141859</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+    <MESSAGE value="Triangle Cmake" />
+    <MESSAGE value="sharders" />
+    <MESSAGE value="Triangle OK" />
+    <MESSAGE value="start pendule" />
+    <MESSAGE value="Pendule work finish" />
+    <option name="LAST_COMMIT_MESSAGE" value="Pendule work finish" />
+  </component>
+</project>
