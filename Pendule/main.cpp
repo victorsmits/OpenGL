@@ -171,8 +171,8 @@ void generateSphere(float radius) {
 
 	for(int i=0; i < 3; i ++) {
         float x = 0;
-        float y = 0;
-        float z = i * radius;
+        float z = 0;
+        float y = i * radius;
 
         Vertex v;
         v.pos = glm::vec3(x, y, -z);
@@ -194,7 +194,7 @@ void generateSphere(float radius) {
 
     indices.push_back(topLeft);
     indices.push_back(bottomLeft);
-    indices.push_back(topLeft);
+    indices.push_back(bottomLeft);
     indices.push_back(topRight);
 }
 
@@ -1780,32 +1780,36 @@ private:
 		vkMapMemory(device, vertexBufferMemory, 0, bufferSize, 0, &data);
 
 		Vertex* vertexData = (Vertex*) data;
+        float deltaT = 0.0001;
 
+        glm::vec3* initPos = new glm::vec3[vertices.size()];
 
+        // application de la gravité
 		for(int i=0; i < vertices.size(); i++) {
-		    float deltaT = 0.002;
 		    glm::vec3 g = { 0, 0, -9.81 };
+            initPos[i] = vertexData[i].pos;
 
-		    glm::vec3 initPos = vertexData[i].pos;
-
-		    vertexData[i].speed += (deltaT * g)*vertexData[i].movable;
+		    vertexData[i].speed += ((1-deltaT) * g)*vertexData[i].movable;
 		    vertexData[i].pos += (deltaT * vertexData[i].speed);
-
-		    vertexData[i].speed = (vertexData[i].pos-initPos)/deltaT;
 		}
 
+		// application des contraintes
         for(int j=0; j < vertices.size()-1; j++) {
-            float norm = glm::distance(vertexData[j+1].pos,vertexData[j].pos);
+
+            float norm = glm::length(vertexData[j].pos - vertexData[j+1].pos);
             glm::vec3 unit = (vertexData[j].pos-vertexData[j+1].pos)/norm;
 
-            vertexData[j].pos -= (vertexData[j].norm - norm) * unit * 0.8f * (vertexData[j].movable/(vertexData[j+1].movable + vertexData[j].movable));
-            vertexData[j+1].pos += (vertexData[j].norm - norm) * unit * 0.8f * (vertexData[j].movable/(vertexData[j].movable + vertexData[j+1].movable));
+            vertexData[j].pos += (vertexData[j].norm - norm) * unit * 0.8f * (vertexData[j].movable/(vertexData[j+1].movable + vertexData[j].movable));
+            vertexData[j+1].pos -= (vertexData[j].norm - norm) * unit * 0.8f * (vertexData[j+1].movable/(vertexData[j].movable + vertexData[j+1].movable));
         }
 
+        //update de la vitesse
         for(int i=0; i < vertices.size(); i++) {
-            vertexData[i].speed = (vertexData[i].pos-initPos)/deltaT;
+
+            vertexData[i].speed = (vertexData[i].pos-initPos[i])/deltaT;
         }
 
+		delete[] initPos;
 
 		vkUnmapMemory(device, vertexBufferMemory);
 	}
