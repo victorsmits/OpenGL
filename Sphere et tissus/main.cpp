@@ -229,12 +229,12 @@ void generateSphere(float radius, int divisions) {
 std::vector<Vertex> clothVertices;
 std::vector<uint16_t> clothIndices;
 void generateCloth(float len, float divisions){
-    for(float i= -len/2; i < len/2; i+=(1/divisions)) {
-        for(float j= -len/2; j < len/2; j+=(1/divisions)) {
+    for(float i= -len/2; i < len/2; i+=(len/divisions)) {
+        for(float j= -len/2; j < len/2; j+=(len/divisions)) {
 
             float x = i;
             float y = j;
-            float z = 1.1;
+            float z = 2;
 
             Vertex v;
             v.pos = glm::vec3(x, y, z);
@@ -247,21 +247,21 @@ void generateCloth(float len, float divisions){
         }
     }
 
-//    for(float i=0; i < 2*divisions; i++) {
-//        for(float j=0; j < 2*divisions; j++) {
-//            int bottomLeft = i * (2*divisions + 1) + j;
-//            int topLeft = bottomLeft + 1  ;
-//            int topRight = topLeft + (2*divisions + 1);
-//            int bottomRight = topRight - 1;
-//
-//            clothIndices.push_back(topLeft);
-//            clothIndices.push_back(bottomLeft);
-//            clothIndices.push_back(bottomRight);
-//            clothIndices.push_back(topLeft);
-//            clothIndices.push_back(bottomRight);
-//            clothIndices.push_back(topRight);
-//        }
-//    }
+    for(float i=0; i < (divisions); i++) {
+        for(float j=0; j < (divisions); j++) {
+            int bottomLeft = (j * divisions + j)+i;
+            int topLeft = bottomLeft + 1  ;
+            int bottomRight = bottomLeft + divisions + 1;
+            int topRight = bottomRight + 1;
+
+            clothIndices.push_back(topLeft);
+            clothIndices.push_back(bottomLeft);
+            clothIndices.push_back(bottomRight);
+            clothIndices.push_back(topLeft);
+            clothIndices.push_back(bottomRight);
+            clothIndices.push_back(topRight);
+        }
+    }
 }
 
 std::vector<Vertex> ropeVertices = {
@@ -285,7 +285,7 @@ std::vector<uint16_t> ropeIndices = {0, 1, 1, 2, 2, 3};
 
 std::vector<Constraint> ropeConstraints;
 
-float division = 10;
+float division = 15.0f;
 
 class Engine {
 public:
@@ -394,22 +394,29 @@ private:
 		vkMapMemory(device, clothVertexBufferMemory, 0, bufferSize, 0, &data);
 
 		clothVertexData = (Vertex*) data;
-		for(int i=0; i + (2 * division) < clothVertices.size(); i++) {
-            ropeConstraints.push_back(Constraint(i, i + (2 * division), clothVertexData));
-
-            clothIndices.push_back(i);
-            clothIndices.push_back(i + (2 * division));
-
-        }
-
-        for(int i = 0; i < (2 * division); i++){
-            for(int j = 0; j + 1 < (2 * division); j++) {
-                ropeConstraints.push_back(Constraint(j, j + 1, clothVertexData));
-                clothIndices.push_back(i + (j * division));
-                clothIndices.push_back(i + 1 + (j * division));
+        for (int i = 0; i <= division; i ++){
+            for (int l = 0; l < division; l++){
+                ropeConstraints.push_back(Constraint(i+l+(l*division), i+l+((l+1)*division)+1, clothVertexData));
+                clothIndices.push_back(1);
+//                clothIndices.push_back(i+l+((l+1)*division)+1);
+                if (i != division) {
+                    ropeConstraints.push_back(Constraint(i+l+(l*division), i+l+((l+1)*division)+1+1, clothVertexData));
+//                    clothIndices.push_back(i+l+(l*division));
+//                    clothIndices.push_back(i+l+((l+1)*division)+1+1);
+                }
+                if (i != 0) {
+                    ropeConstraints.push_back(Constraint(i+l+(l*division), i+l+((l+1)*division), clothVertexData));
+//                    clothIndices.push_back(i+l+(l*division));
+//                    clothIndices.push_back(i+l+((l+1)*division));
+                }
             }
         }
 
+        for (int l = 0; l <= division*(division+1); l += division+1){
+            for (int i = 0 ; i < division; i++ ){
+                ropeConstraints.push_back(Constraint(l+i, l+i+1, clothVertexData));
+            }
+        }
 		vkUnmapMemory(device, clothVertexBufferMemory);
 	}
 
@@ -488,14 +495,14 @@ private:
             if( length <= 1.0f){
                 glm::vec3 unit = (clothVertexData[i].pos-center)/length;
                 clothVertexData[i].pos = unit * 1.0f;
+                clothVertexData[i].speed = glm::vec3(0.01);
+                clothVertexData[i].movable = 0.001;
+            } else{
+                if (clothVertexData[i].movable < 1){
+                    clothVertexData[i].movable += 0.001;
+                }
             }
         }
-
-        //update de la vitesse
-        for(int i=0; i < clothVertices.size(); i++) {
-            clothVertexData[i].speed = (clothVertexData[i].pos-initPos[i])/deltaT;
-        }
-
         vkUnmapMemory(device, clothVertexBufferMemory);
 	}
 
@@ -516,7 +523,7 @@ private:
 
 	void initVulkan() {
 		generateSphere(1.0f, 32);
-		generateCloth(2.0f,division);
+		generateCloth(4.0f,division);
 		createInstance();
 		setupDebugMessenger();
 		createSurface();
@@ -1832,6 +1839,7 @@ private:
             vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS,
                     graphicsPipeline);
 
+            //Draw Sphere
 
             VkBuffer vertexBuffers[] = {vertexBuffer};
             VkDeviceSize offsets[] = {0};
@@ -1849,26 +1857,25 @@ private:
                     1, 0, 0, 0);
 
 
+            //Drawn cloth
+
             VkBuffer clothVertexBuffers[] = {clothVertexBuffer};
             vkCmdBindVertexBuffers(commandBuffers[i], 0, 1,
                                   clothVertexBuffers, offsets);
-//
-//            vkCmdBindIndexBuffer(commandBuffers[i], clothIndexBuffer, 0,
-//                                 VK_INDEX_TYPE_UINT16);
-//
-//            vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(clothIndices.size()),
-//                    1, 0, 0, 0);
+
+            //Texture
+
+            vkCmdBindIndexBuffer(commandBuffers[i], clothIndexBuffer, 0,
+                                 VK_INDEX_TYPE_UINT16);
+
+            vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(clothIndices.size()),
+                    1, 0, 0, 0);
 
 
+            //Drawn vertices
+/*
             vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS,
                     pointGraphicsPipeline); // HERE
-
-            vkCmdBindVertexBuffers(commandBuffers[i], 0, 1,
-                    clothVertexBuffers, offsets);
-
-            VkBuffer VertexBuffers[] = {vertexBuffer};
-            vkCmdBindVertexBuffers(commandBuffers[i], 0, 1,
-                                   clothVertexBuffers, offsets);
 
             vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS,
                     pointPipelineLayout, 0, 1, &simpleDescriptorSets[i],
@@ -1889,7 +1896,7 @@ private:
 
             vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(clothIndices.size()),
                     1, 0, 0, 0); // HERE
-
+*/
 			vkCmdEndRenderPass(commandBuffers[i]);
 
 			if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
@@ -1971,7 +1978,7 @@ private:
 
 		UniformBufferObject ubo = {};
 		ubo.model = glm::rotate(glm::mat4(1.0f), 0.1f * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		ubo.view = glm::lookAt(glm::vec3(3.0f, 0.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		ubo.view = glm::lookAt(glm::vec3(7.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float) swapChainExtent.height, 0.1f, 10.0f);
 		ubo.proj[1][1] *= -1;
 		ubo.lightPos = glm::vec3(10.0f, glm::cos(time) * 10.0f, 10.0f);
@@ -2016,7 +2023,7 @@ private:
 		updateUniformBuffer(imageIndex);
 		//updateVertices(); // HERE
 //		updateRope();
-//        updateCloth();
+        updateCloth();
 
 //		submitComputeCommand();
 		

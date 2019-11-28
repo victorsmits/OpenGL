@@ -1161,6 +1161,7 @@ private:
 
             vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 
+
             vkCmdEndRenderPass(commandBuffers[i]);
 
             if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
