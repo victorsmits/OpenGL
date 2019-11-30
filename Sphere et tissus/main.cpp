@@ -194,7 +194,7 @@ void generateSphere(float radius, int divisions) {
 		for(int j=0; j <= divisions; j++) {
 			float phy = glm::radians(((float) i*360.0f)/(2*divisions));
 			float theta = glm::radians((((float) divisions)/2 - j)*(180.0f)/divisions);
-			
+
 			float x = radius * glm::cos(theta) * glm::cos(phy);
 			float y = radius * glm::cos(theta) * glm::sin(phy);
 			float z = radius * glm::sin(theta);
@@ -285,7 +285,7 @@ std::vector<uint16_t> ropeIndices = {0, 1, 1, 2, 2, 3};
 
 std::vector<Constraint> ropeConstraints;
 
-float division = 15.0f;
+float division = 21.0f;
 
 class Engine {
 public:
@@ -321,7 +321,7 @@ private:
 	VkDescriptorSetLayout descriptorSetLayout;
 	VkDescriptorSetLayout simpleDescriptorSetLayout; //HERE
 	VkDescriptorSetLayout computeDescriptorSetLayout; //COMPUTE
-	
+
 	VkPipelineLayout pipelineLayout;
 	VkPipeline graphicsPipeline;
 
@@ -499,7 +499,7 @@ private:
                 clothVertexData[i].movable = 0.001;
             } else{
                 if (clothVertexData[i].movable < 1){
-                    clothVertexData[i].movable += 0.001;
+                    clothVertexData[i].movable += 0.0001;
                 }
             }
         }
@@ -606,7 +606,7 @@ private:
 
 		vkDestroyPipeline(device, lineGraphicsPipeline, nullptr); //HERE
 		vkDestroyPipelineLayout(device, linePipelineLayout, nullptr); //HERE
-		
+
 		vkDestroyRenderPass(device, renderPass, nullptr);
 
 		for (auto imageView : swapChainImageViews) {
@@ -2026,7 +2026,7 @@ private:
         updateCloth();
 
 //		submitComputeCommand();
-		
+
 		VkSubmitInfo submitInfo = {};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 

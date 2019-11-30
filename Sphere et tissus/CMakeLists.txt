@@ -1,12 +1,15 @@
 cmake_minimum_required(VERSION 3.14)
 project(Sphere_Cloth)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -std=c++17  " )
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -std=c++17" )
 
 add_executable(${PROJECT_NAME} main.cpp)
 
 find_package(Vulkan REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
 
 if (VULKAN_FOUND)
     message(STATUS "Found Vulkan, Including and Linking now")
