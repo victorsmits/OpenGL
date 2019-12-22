@@ -285,7 +285,7 @@ std::vector<uint16_t> ropeIndices = {0, 1, 1, 2, 2, 3};
 
 std::vector<Constraint> ropeConstraints;
 
-float division = 21.0f;
+float division = 15.0f;
 
 class Engine {
 public:
@@ -1044,8 +1044,8 @@ private:
 		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
 		//HERE
-		//auto bindingDescription = Vertex::getBindingDescription();
-		//auto attributeDescriptions = Vertex::getAttributeDescriptions();
+		auto bindingDescription = Vertex::getBindingDescription();
+		auto attributeDescriptions = Vertex::getAttributeDescriptions();
 
 		vertexInputInfo.vertexBindingDescriptionCount = 1;
 		vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(vertexAttributeDescription.size()); //HERE
@@ -1838,11 +1838,12 @@ private:
 
             vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS,
                     graphicsPipeline);
+            VkDeviceSize offsets[] = {0};
 
             //Draw Sphere
-
+/*
             VkBuffer vertexBuffers[] = {vertexBuffer};
-            VkDeviceSize offsets[] = {0};
+
             vkCmdBindVertexBuffers(commandBuffers[i], 0, 1,
                     vertexBuffers, offsets);
 
@@ -1855,7 +1856,7 @@ private:
 
             vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()),
                     1, 0, 0, 0);
-
+*/
 
             //Drawn cloth
 
@@ -1865,15 +1866,15 @@ private:
 
             //Texture
 
-            vkCmdBindIndexBuffer(commandBuffers[i], clothIndexBuffer, 0,
-                                 VK_INDEX_TYPE_UINT16);
-
-            vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(clothIndices.size()),
-                    1, 0, 0, 0);
+//            vkCmdBindIndexBuffer(commandBuffers[i], clothIndexBuffer, 0,
+//                                 VK_INDEX_TYPE_UINT16);
+//
+//            vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(clothIndices.size()),
+//                    1, 0, 0, 0);
 
 
             //Drawn vertices
-/*
+
             vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS,
                     pointGraphicsPipeline); // HERE
 
@@ -1896,7 +1897,7 @@ private:
 
             vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(clothIndices.size()),
                     1, 0, 0, 0); // HERE
-*/
+
 			vkCmdEndRenderPass(commandBuffers[i]);
 
 			if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
