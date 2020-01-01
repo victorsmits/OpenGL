@@ -285,7 +285,7 @@ std::vector<uint16_t> ropeIndices = {0, 1, 1, 2, 2, 3};
 
 std::vector<Constraint> ropeConstraints;
 
-float division = 15.0f;
+float division = 23.0f;
 
 class Engine {
 public:
@@ -417,6 +417,8 @@ private:
                 ropeConstraints.push_back(Constraint(l+i, l+i+1, clothVertexData));
             }
         }
+
+        printf("%d",ropeConstraints.size());
 		vkUnmapMemory(device, clothVertexBufferMemory);
 	}
 
@@ -472,12 +474,10 @@ private:
 
         float deltaT = 0.001;
 
-        glm::vec3* initPos = new glm::vec3[clothVertices.size()];
 
         // application de la gravité
         for(int i=0; i < clothVertices.size(); i++) {
             glm::vec3 g = { 0, 0, -9.81 };
-            initPos[i] = clothVertexData[i].pos;
 
             clothVertexData[i].speed += ((deltaT) * g)*clothVertexData[i].movable;
             clothVertexData[i].pos += (deltaT * clothVertexData[i].speed);
@@ -1685,7 +1685,7 @@ private:
 		}
 
 		VkDescriptorBufferInfo vertexBufferInfo = {};
-		vertexBufferInfo.buffer = ropeVertexBuffer;
+		vertexBufferInfo.buffer = clothVertexBuffer;
 		vertexBufferInfo.offset = 0;
 		vertexBufferInfo.range = VK_WHOLE_SIZE;
 
@@ -1697,6 +1697,7 @@ private:
 		//VkWriteDescriptorSet descriptorWrites = {};
 		std::array<VkWriteDescriptorSet, 2> descriptorWrites = {};
 
+        // vertex block
 		descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		descriptorWrites[0].dstSet = computeDescriptorSet;
 		descriptorWrites[0].dstBinding = 0;
@@ -1705,6 +1706,7 @@ private:
 		descriptorWrites[0].descriptorCount = 1;
 		descriptorWrites[0].pBufferInfo = &vertexBufferInfo;
 
+		// constraint block
 		descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		descriptorWrites[1].dstSet = computeDescriptorSet;
 		descriptorWrites[1].dstBinding = 1;
@@ -1841,7 +1843,7 @@ private:
             VkDeviceSize offsets[] = {0};
 
             //Draw Sphere
-/*
+
             VkBuffer vertexBuffers[] = {vertexBuffer};
 
             vkCmdBindVertexBuffers(commandBuffers[i], 0, 1,
@@ -1856,7 +1858,7 @@ private:
 
             vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()),
                     1, 0, 0, 0);
-*/
+
 
             //Drawn cloth
 
@@ -1941,7 +1943,7 @@ private:
 
 		vkCmdBindDescriptorSets(computeCommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, computePipelineLayout, 0, 1, &computeDescriptorSet, 0, nullptr);
 
-		vkCmdDispatch(computeCommandBuffer, ropeVertices.size()/32 + 1, 1, 1);
+		vkCmdDispatch(computeCommandBuffer, clothVertices.size()/32 + 1, 1, 1);
 
 		memoryBarrier(computeCommandBuffer, VK_ACCESS_SHADER_WRITE_BIT, VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT, VK_PIPELINE_STAGE_VERTEX_INPUT_BIT);
 
@@ -2024,9 +2026,9 @@ private:
 		updateUniformBuffer(imageIndex);
 		//updateVertices(); // HERE
 //		updateRope();
-        updateCloth();
+//        updateCloth();
 
-//		submitComputeCommand();
+		submitComputeCommand();
 
 		VkSubmitInfo submitInfo = {};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

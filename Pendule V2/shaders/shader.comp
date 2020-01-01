@@ -20,6 +20,8 @@ struct Constraint {
 	int A;
 	int B;
 	float length;
+
+	
 };
 
 layout(std430, binding = 1) buffer constraintBlock {
