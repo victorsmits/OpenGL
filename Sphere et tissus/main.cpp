@@ -285,7 +285,8 @@ std::vector<uint16_t> ropeIndices = {0, 1, 1, 2, 2, 3};
 
 std::vector<Constraint> ropeConstraints;
 
-float division = 23.0f;
+float division = 42.0f;
+float len = 2.0f;
 
 class Engine {
 public:
@@ -523,7 +524,7 @@ private:
 
 	void initVulkan() {
 		generateSphere(1.0f, 32);
-		generateCloth(4.0f,division);
+		generateCloth(len,division);
 		createInstance();
 		setupDebugMessenger();
 		createSurface();
@@ -1867,13 +1868,13 @@ private:
                                   clothVertexBuffers, offsets);
 
             //Texture
+/*
+            vkCmdBindIndexBuffer(commandBuffers[i], clothIndexBuffer, 0,
+                                 VK_INDEX_TYPE_UINT16);
 
-//            vkCmdBindIndexBuffer(commandBuffers[i], clothIndexBuffer, 0,
-//                                 VK_INDEX_TYPE_UINT16);
-//
-//            vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(clothIndices.size()),
-//                    1, 0, 0, 0);
-
+            vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(clothIndices.size()),
+                    1, 0, 0, 0);
+*/
 
             //Drawn vertices
 
