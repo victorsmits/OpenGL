@@ -286,7 +286,7 @@ std::vector<uint16_t> ropeIndices = {0, 1, 1, 2, 2, 3};
 std::vector<Constraint> ropeConstraints;
 
 float division = 42.0f;
-float len = 2.0f;
+float len = 3.0f;
 
 class Engine {
 public:
@@ -398,7 +398,7 @@ private:
         for (int i = 0; i <= division; i ++){
             for (int l = 0; l < division; l++){
                 ropeConstraints.push_back(Constraint(i+l+(l*division), i+l+((l+1)*division)+1, clothVertexData));
-                clothIndices.push_back(1);
+//                clothIndices.push_back(1);
 //                clothIndices.push_back(i+l+((l+1)*division)+1);
                 if (i != division) {
                     ropeConstraints.push_back(Constraint(i+l+(l*division), i+l+((l+1)*division)+1+1, clothVertexData));
@@ -490,6 +490,7 @@ private:
                 c.apply(clothVertexData);
             }
         }
+
 
         for(int i=0; i < clothVertices.size(); i++){
             float length = glm::length(clothVertexData[i].pos-center);
@@ -1083,7 +1084,6 @@ private:
 		rasterizer.depthClampEnable = VK_FALSE;
 		rasterizer.rasterizerDiscardEnable = VK_FALSE;
 		rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
-		//rasterizer.polygonMode = VK_POLYGON_MODE_POINT;
 		rasterizer.lineWidth = 1.0f;
 		rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
 		rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
