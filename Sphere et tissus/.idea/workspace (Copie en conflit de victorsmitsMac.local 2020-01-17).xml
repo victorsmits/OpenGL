@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
+    <generated>
+      <config projectName="Sphere_Cloth" targetName="Sphere_Cloth" />
+    </generated>
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="87b26142-c6e2-4b60-9431-b2531d95aacd" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="ElmWorkspace">
+    <elmProjects />
+    <settings elmCompilerPath="" elmFormatPath="" elmTestPath="" isElmFormatOnSaveEnabled="false" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+    <option name="UPDATE_TYPE" value="MERGE" />
+  </component>
+  <component name="ProjectId" id="1VHnHPbh0NgcT2VWjSwQ0euAOHP" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+  </component>
+  <component name="RunManager">
+    <configuration name="Sphere_Cloth" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Sphere_Cloth" TARGET_NAME="Sphere_Cloth" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Sphere_Cloth" RUN_TARGET_NAME="Sphere_Cloth">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
+  </component>
+  <component name="StructureViewFactory">
+    <option name="ACTIVE_ACTIONS" value=",ALPHA_COMPARATOR,KIND" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="87b26142-c6e2-4b60-9431-b2531d95aacd" name="Default Changelist" comment="" />
+      <created>1576918800787</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1576918800787</updated>
+      <workItem from="1576918804220" duration="3330000" />
+      <workItem from="1577266356493" duration="124000" />
+      <workItem from="1577886510958" duration="8000" />
+      <workItem from="1577886530293" duration="429000" />
+      <workItem from="1577887027552" duration="668000" />
+      <workItem from="1577891425913" duration="366000" />
+      <workItem from="1577891799935" duration="4866000" />
+      <workItem from="1577896681860" duration="5736000" />
+      <workItem from="1577903840340" duration="6000" />
+      <workItem from="1577903858947" duration="199000" />
+      <workItem from="1577904169040" duration="32000" />
+      <workItem from="1577904221592" duration="261000" />
+      <workItem from="1577956797503" duration="4000" />
+      <workItem from="1577956809549" duration="700000" />
+      <workItem from="1577958552502" duration="4573000" />
+      <workItem from="1577991625890" duration="97000" />
+      <workItem from="1579171994753" duration="2443000" />
+      <workItem from="1579195511010" duration="26000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="560" y="216" key="#Notifications" timestamp="1577886536674">
+      <screen x="0" y="23" width="1920" height="1057" />
+    </state>
+    <state x="560" y="216" key="#Notifications/0.23.1920.1057/1920.23.1920.1057@0.23.1920.1057" timestamp="1577886536674" />
+    <state x="424" y="202" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1577897021937">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="424" y="202" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1080/1920.0.1920.1080@0.0.1920.1080" timestamp="1577897021937" />
+    <state x="486" y="224" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1577904172767">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="486" y="224" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1440.900@0.0.1440.900" timestamp="1577904172767" />
+    <state x="648" y="286" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.23.1920.1057/1920.23.1920.1057@0.23.1920.1057" timestamp="1577886513533" />
+    <state width="1398" height="244" key="GridCell.Tab.0.bottom" timestamp="1579195536757">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="1398" height="244" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1579195536757" />
+    <state width="1878" height="205" key="GridCell.Tab.0.bottom/0.0.1920.1080/1920.0.1920.1080@0.0.1920.1080" timestamp="1577963889425" />
+    <state width="1398" height="245" key="GridCell.Tab.0.bottom/0.23.1440.791@0.23.1440.791" timestamp="1577904442607" />
+    <state width="1398" height="244" key="GridCell.Tab.0.center" timestamp="1579195536756">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="1398" height="244" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1579195536756" />
+    <state width="1878" height="205" key="GridCell.Tab.0.center/0.0.1920.1080/1920.0.1920.1080@0.0.1920.1080" timestamp="1577963889424" />
+    <state width="1398" height="245" key="GridCell.Tab.0.center/0.23.1440.791@0.23.1440.791" timestamp="1577904442604" />
+    <state width="1398" height="244" key="GridCell.Tab.0.left" timestamp="1579195536755">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="1398" height="244" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1579195536755" />
+    <state width="1878" height="205" key="GridCell.Tab.0.left/0.0.1920.1080/1920.0.1920.1080@0.0.1920.1080" timestamp="1577963889424" />
+    <state width="1398" height="245" key="GridCell.Tab.0.left/0.23.1440.791@0.23.1440.791" timestamp="1577904442602" />
+    <state width="1398" height="244" key="GridCell.Tab.0.right" timestamp="1579195536756">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="1398" height="244" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1579195536756" />
+    <state width="1878" height="205" key="GridCell.Tab.0.right/0.0.1920.1080/1920.0.1920.1080@0.0.1920.1080" timestamp="1577963889425" />
+    <state width="1398" height="245" key="GridCell.Tab.0.right/0.23.1440.791@0.23.1440.791" timestamp="1577904442606" />
+    <state x="352" y="149" key="SettingsEditor" timestamp="1577904299324">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="352" y="149" key="SettingsEditor/0.0.1440.900@0.0.1440.900" timestamp="1577904299324" />
+    <state x="469" y="179" key="SettingsEditor/0.0.1920.1080/1920.0.1920.1080@0.0.1920.1080" timestamp="1577896674501" />
+    <state x="100" y="100" width="1720" height="880" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1577894014037">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="100" y="100" width="1720" height="880" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.1920.1080/1920.0.1920.1080@0.0.1920.1080" timestamp="1577894014037" />
+    <state x="503" y="374" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1579173779254">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="503" y="374" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1440.900@0.0.1440.900" timestamp="1579173779254" />
+    <state x="552" y="127" width="816" height="825" key="find.popup" timestamp="1577894858051">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="552" y="127" width="816" height="825" key="find.popup/0.0.1920.1080/1920.0.1920.1080@0.0.1920.1080" timestamp="1577894858051" />
+    <state x="469" y="201" width="670" height="564" key="search.everywhere.popup" timestamp="1579182443345">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="469" y="201" width="670" height="564" key="search.everywhere.popup/0.0.1440.900@0.0.1440.900" timestamp="1579182443345" />
+    <state x="625" y="241" width="670" height="676" key="search.everywhere.popup/0.0.1920.1080/1920.0.1920.1080@0.0.1920.1080" timestamp="1577901350527" />
+  </component>
+</project>
